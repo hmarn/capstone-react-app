@@ -1,0 +1,64 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+
+jobs: 
+  build-frontend:
+    docker:
+      # Use the same Node base as ./Dockerfile
+      - image: cimg/node:14.19.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: frontend-build-{{ checksum "./package-lock.json" }}
+      - run:
+          name: Build front-end
+          command: |
+            sudo npm install
+            npm run build
+      - save_cache:
+          paths: [./frontend/node_modules]
+          key: frontend-build-{{ checksum "./package-lock.json" }}
+
+  test-frontend:
+    docker:
+      # Use the same Node base as ./Dockerfile
+      - image: cimg/node:14.19.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: frontend-build-{{ checksum "./package-lock.json" }}
+      - run:
+          name: Test front-end
+          command: |
+            sudo npm install
+            npm run test
+
+  eslint-frontend:
+    docker:
+      # Use the same Node base as ./Dockerfile
+      - image: cimg/node:14.19.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: frontend-build-{{ checksum "./package-lock.json" }}
+      - run:
+          name: Eslint front-end
+          command: |
+            sudo npm install
+            npm run lint
+
+workflows:
+  version: 2
+  default:
+    jobs:
+      - build-frontend
+      - test-frontend:
+          requires:
+            - build-frontend
+      - eslint-frontend:
+          requires:
+            - build-frontend
+      
