@@ -1,0 +1,22 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "capstone-react-app"
+	},
+	{
+		"ParameterKey": "SecurityGroupId",
+		"ParameterValue": "sg-045a1d620d4507230"
+	},
+	{
+		"ParameterKey": "SSHKeyName",
+		"ParameterValue": "uswest2-project-udacity"
+	},
+	{
+		"ParameterKey": "InstanceToUse",
+		"ParameterValue": "t3.micro"
+	},
+	{
+		"ParameterKey": "AMIToUse",
+		"ParameterValue": "ami-0ceecbb0f30a902a6"
+	}
+]

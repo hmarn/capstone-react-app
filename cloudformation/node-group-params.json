@@ -1,0 +1,18 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "capstone-react-app"
+	},
+	{
+		"ParameterKey": "AMITypetoUse",
+		"ParameterValue": "AL2_x86_64"
+	},
+	{
+		"ParameterKey": "CapacityToUse",
+		"ParameterValue": "ON_DEMAND"
+	},
+	{
+		"ParameterKey": "InstanceToUse",
+		"ParameterValue": "t3.micro"
+	}
+]

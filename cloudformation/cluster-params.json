@@ -1,0 +1,14 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "capstone-react-app"
+	},
+	{
+		"ParameterKey": "VpcId",
+		"ParameterValue": "vpc-08723801a98ff56eb"
+	},
+	{
+		"ParameterKey": "SGId",
+		"ParameterValue": "sg-045a1d620d4507230"
+	}
+]

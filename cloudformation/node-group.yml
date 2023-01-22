@@ -1,0 +1,83 @@
+Description: >
+    HMarn / Udacity Capstone Project
+    This template deploys IAM role and EKS NodeGroup.
+    
+Parameters:
+
+    EnvironmentName:
+        Description: An environment name that will be prefixed to resource names.
+        Type: String
+
+    AMITypetoUse:
+        Description: An AMI name for node group instance.
+        Type: String
+    
+    CapacityToUse:
+        Description: An capacity for node group instance.
+        Type: String
+    
+    InstanceToUse:
+        Description: An capacity for node group instance.
+        Type: String
+
+Resources:
+    EKSClusterNodeRole:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: !Sub ${EnvironmentName}-cluster-node-role
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                        Service:
+                            - ec2.amazonaws.com
+                      Action:
+                        - sts:AssumeRole
+            Path: "/"
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+                - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+                - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+            Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName}-EKSClusterNodeRole
+                        
+    EKSNodeGroup:
+        Type: AWS::EKS::Nodegroup
+        Properties:
+            AmiType: !Ref AMITypetoUse
+            CapacityType: !Ref CapacityToUse
+            InstanceTypes:
+                - !Ref InstanceToUse
+            Labels: 
+                Key : Value
+            DiskSize: 20
+            ClusterName: !Sub ${EnvironmentName}-cluster
+            NodeRole: !GetAtt EKSClusterNodeRole.Arn
+            NodegroupName: !Sub ${EnvironmentName}-nodegroup
+            ScalingConfig:
+                MinSize: 2
+                MaxSize: 2
+                DesiredSize: 2
+            Subnets:
+                Fn::Split:
+                    - ","
+                    - Fn::ImportValue:
+                            Fn::Sub: ${EnvironmentName}-PUB-NETS
+            Tags:
+                Key: Name
+                Value: !Sub ${EnvironmentName}-NodeGroup
+
+Outputs:
+    EKSClusterNodeRole:
+        Description: Role for accessing and creating aws resources
+        Value: !GetAtt EKSClusterNodeRole.Arn
+        Export:
+            Name: !Sub ${EnvironmentName}-EKSNodeRole
+
+    EKSNodeGroup:
+        Description: NodeGroup id
+        Value: !Ref EKSNodeGroup
+        Export:
+            Name: !Sub ${EnvironmentName}-NodeGroup
