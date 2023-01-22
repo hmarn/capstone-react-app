@@ -1,7 +1,7 @@
 [
 	{
 		"ParameterKey": "EnvironmentName",
-		"ParameterValue": "capstone-react-app"
+		"ParameterValue": "capstone-project"
 	},
 	{
 		"ParameterKey": "VpcId",

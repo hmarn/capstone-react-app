@@ -3,6 +3,9 @@ Description: >
     This template deploys Nodes.
     
 Parameters:
+    ID:
+        Description: Unique identifier.
+        Type: String
 
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names.
@@ -41,7 +44,7 @@ Resources:
                   CidrIp: 0.0.0.0/0
             Tags: 
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-Nodes-SCG
+                  Value: !Sub ${EnvironmentName}-Nodes-SCG-${ID}
     
     Node1:
         Type: AWS::EC2::Instance
@@ -53,7 +56,7 @@ Resources:
             ImageId: !Ref AMIToUse
             Tags:
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-Node1
+                  Value: !Sub ${EnvironmentName}-Node1-${ID}
                 - Key: Project
                   Value: !Ref EnvironmentName
 
@@ -67,7 +70,7 @@ Resources:
             ImageId: !Ref AMIToUse
             Tags:
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-Node2
+                  Value: !Sub ${EnvironmentName}-Node2-${ID}
                 - Key: Project
                   Value: !Ref EnvironmentName
 
@@ -76,14 +79,14 @@ Outputs:
         Description: Security group for worker nodes
         Value: !Ref NodesSecurityGroup
         Export:
-            Name: !Sub ${EnvironmentName}-Nodes-SCG
+            Name: !Sub ${EnvironmentName}-Nodes-SCG-${ID}
     Node1:
         Description: Node1 id
         Value: !Ref Node1
         Export:
-            Name: !Sub ${EnvironmentName}-Node1
+            Name: !Sub ${EnvironmentName}-Node1-${ID}
     Node2:
         Description: Node2 id
         Value: !Ref Node2
         Export:
-            Name: !Sub ${EnvironmentName}-Node2
+            Name: !Sub ${EnvironmentName}-Node2-${ID}

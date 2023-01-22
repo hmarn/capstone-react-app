@@ -3,6 +3,9 @@ Description: >
     This template deploys IAM role for EKSCluster and a project cluster.
 
 Parameters:
+    ID:
+        Description: Unique identifier.
+        Type: String
 
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names.
@@ -36,7 +39,7 @@ Resources:
                 - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
             Tags:
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-EKSClusterRole
+                  Value: !Sub ${EnvironmentName}-EKSClusterRole-${ID}
                         
     EKSCluster:
         Type: AWS::EKS::Cluster
@@ -54,17 +57,17 @@ Resources:
                                 Fn::Sub: ${EnvironmentName}-PUB-NETS
             Tags: 
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-EKSCluster
+                  Value: !Sub ${EnvironmentName}-EKSCluster-${ID}
 
 Outputs:
     EKSRoleArn:
         Description: Role for accessing and creating aws resources
         Value: !GetAtt EKSClusterRole.Arn
         Export:
-            Name: !Sub ${EnvironmentName}-EKSRole
+            Name: !Sub ${EnvironmentName}-EKSRole-${ID}
 
     EKSId:
         Description: EKS id
         Value: !Ref EKSCluster
         Export:
-            Name: !Sub ${EnvironmentName}-EKSCluster
+            Name: !Sub ${EnvironmentName}-EKSCluster-${ID}

@@ -3,6 +3,9 @@ Description: >
     This template deploys IAM role and EKS NodeGroup.
     
 Parameters:
+    ID:
+        Description: Unique identifier.
+        Type: String
 
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names.
@@ -41,7 +44,7 @@ Resources:
                 - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
             Tags:
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-EKSClusterNodeRole
+                  Value: !Sub ${EnvironmentName}-EKSClusterNodeRole-${ID}
                         
     EKSNodeGroup:
         Type: AWS::EKS::Nodegroup
@@ -67,17 +70,17 @@ Resources:
                             Fn::Sub: ${EnvironmentName}-PUB-NETS
             Tags:
                 Key: Name
-                Value: !Sub ${EnvironmentName}-NodeGroup
+                Value: !Sub ${EnvironmentName}-NodeGroup-${ID}
 
 Outputs:
     EKSClusterNodeRole:
         Description: Role for accessing and creating aws resources
         Value: !GetAtt EKSClusterNodeRole.Arn
         Export:
-            Name: !Sub ${EnvironmentName}-EKSNodeRole
+            Name: !Sub ${EnvironmentName}-EKSNodeRole-${ID}
 
     EKSNodeGroup:
         Description: NodeGroup id
         Value: !Ref EKSNodeGroup
         Export:
-            Name: !Sub ${EnvironmentName}-NodeGroup
+            Name: !Sub ${EnvironmentName}-NodeGroup-${ID}
