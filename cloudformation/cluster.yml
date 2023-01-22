@@ -10,14 +10,17 @@ Parameters:
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names.
         Type: String
+        Default: capstone-project
 
     VpcId:
         Description: Select a VPC that allows instances to access the Internet.
         Type: String
+        Default: vpc-08723801a98ff56eb
 
     SGId:
         Description: Select a VPC that allows instances to access the Internet.
         Type: String
+        Default: sg-045a1d620d4507230
 
 Resources:
 
@@ -62,9 +65,9 @@ Resources:
 Outputs:
     EKSRoleArn:
         Description: Role for accessing and creating aws resources
-        Value: !GetAtt EKSClusterRole.Arn
+        Value: !Ref EKSClusterRole
         Export:
-            Name: !Sub ${EnvironmentName}-EKSRole-${ID}
+            Name: !Sub ${EnvironmentName}-EKSClusterRole-${ID}
 
     EKSId:
         Description: EKS id

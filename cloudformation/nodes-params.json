@@ -9,7 +9,7 @@
 	},
 	{
 		"ParameterKey": "SSHKeyName",
-		"ParameterValue": "uswest2-project-udacity"
+		"ParameterValue": "MY-SSH-KEY-NAME"
 	},
 	{
 		"ParameterKey": "InstanceToUse",

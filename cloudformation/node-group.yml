@@ -10,18 +10,22 @@ Parameters:
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names.
         Type: String
+        Default: capstone-project
 
     AMITypetoUse:
         Description: An AMI name for node group instance.
         Type: String
+        Default: AL2_x86_64
     
     CapacityToUse:
         Description: An capacity for node group instance.
         Type: String
+        Default: ON_DEMAND
     
     InstanceToUse:
         Description: An capacity for node group instance.
         Type: String
+        Default: t3.micro
 
 Resources:
     EKSClusterNodeRole:

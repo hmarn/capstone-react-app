@@ -6,10 +6,14 @@ Description: >
     and default routes for them in the private subnets.
 
 Parameters:
+    ID:
+        Description: Unique identifier.
+        Type: String
 
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names
         Type: String
+        Default: capstone-project
 
     VpcCIDR: 
         Description: Please enter the IP range (CIDR notation) for this VPC
@@ -44,8 +48,8 @@ Resources:
             CidrBlock: !Ref VpcCIDR
             EnableDnsHostnames: true
             Tags: 
-                - Key: Name 
-                  Value: !Ref EnvironmentName
+                - Key: Name
+                  Value: !Sub ${EnvironmentName}-VPC-${ID}
             
     InternetGateway:
         Type: AWS::EC2::InternetGateway
@@ -219,7 +223,7 @@ Resources:
                   CidrIp: 0.0.0.0/0
             Tags: 
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-SCG
+                  Value: !Sub ${EnvironmentName}-SG-${ID}
 Outputs: 
 
     VPC: 
@@ -286,4 +290,4 @@ Outputs:
         Description: Security group for the cluster control plane communication with worker nodes
         Value: !Ref ControlPlaneSecurityGroup
         Export:
-            Name: !Sub ${EnvironmentName}-SCG
+            Name: !Sub ${EnvironmentName}-SGID
