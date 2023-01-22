@@ -7,27 +7,22 @@ Parameters:
         Description: Unique identifier.
         Type: String
 
-    EnvironmentName:
-        Description: An environment name that will be prefixed to resource names.
-        Type: String
-        Default: capstone-project
-
     VpcId:
         Description: Select a VPC that allows instances to access the Internet.
         Type: String
-        Default: vpc-08723801a98ff56eb
+        Default: vpc-0e785190d96840d03
 
     SGId:
         Description: Select a VPC that allows instances to access the Internet.
         Type: String
-        Default: sg-045a1d620d4507230
+        Default: sg-0ef2679a8178606a0
 
 Resources:
 
     EKSClusterRole:
         Type: AWS::IAM::Role
         Properties:
-            RoleName: !Sub ${EnvironmentName}-cluster-role
+            RoleName: !Sub cluster-role-${ID}
             AssumeRolePolicyDocument:
                 Version: "2012-10-17"
                 Statement:
@@ -42,13 +37,13 @@ Resources:
                 - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
             Tags:
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-EKSClusterRole-${ID}
+                  Value: !Sub EKSClusterRole-${ID}
                         
     EKSCluster:
         Type: AWS::EKS::Cluster
         Properties:
             Version: "1.24"
-            Name: !Sub ${EnvironmentName}-cluster
+            Name: !Sub cluster-${ID}
             RoleArn: !GetAtt EKSClusterRole.Arn
             ResourcesVpcConfig:
                 SecurityGroupIds:
@@ -57,20 +52,20 @@ Resources:
                     Fn::Split:
                         - ","
                         - Fn::ImportValue:
-                                Fn::Sub: ${EnvironmentName}-PUB-NETS
+                                Fn::Sub: ${ID}-PUB-NETS
             Tags: 
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-EKSCluster-${ID}
+                  Value: !Sub EKSCluster-${ID}
 
 Outputs:
-    EKSRoleArn:
-        Description: Role for accessing and creating aws resources
+    EKSClusterRole:
+        Description: Role for accessing and creating EKS Cluster
         Value: !Ref EKSClusterRole
         Export:
-            Name: !Sub ${EnvironmentName}-EKSClusterRole-${ID}
+            Name: !Sub EKSClusterRole-${ID}
 
-    EKSId:
+    EKSCluster:
         Description: EKS id
         Value: !Ref EKSCluster
         Export:
-            Name: !Sub ${EnvironmentName}-EKSCluster-${ID}
+            Name: !Sub EKSCluster-${ID}

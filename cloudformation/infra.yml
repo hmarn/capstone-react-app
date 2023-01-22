@@ -10,11 +10,6 @@ Parameters:
         Description: Unique identifier.
         Type: String
 
-    EnvironmentName:
-        Description: An environment name that will be prefixed to resource names
-        Type: String
-        Default: capstone-project
-
     VpcCIDR: 
         Description: Please enter the IP range (CIDR notation) for this VPC
         Type: String
@@ -49,14 +44,14 @@ Resources:
             EnableDnsHostnames: true
             Tags: 
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-VPC-${ID}
+                  Value: !Sub VPC-${ID}
             
     InternetGateway:
         Type: AWS::EC2::InternetGateway
         Properties:
             Tags:
                 - Key: Name
-                  Value: !Ref EnvironmentName
+                  Value: !Sub ${ID} InternetGateway
             
     InternetGatewayAttachment:
         Type: AWS::EC2::VPCGatewayAttachment
@@ -73,7 +68,7 @@ Resources:
             MapPublicIpOnLaunch: true
             Tags: 
                 - Key: Name 
-                  Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+                  Value: !Sub ${ID} Public Subnet (AZ1)
 
     PublicSubnet2: 
         Type: AWS::EC2::Subnet
@@ -84,7 +79,7 @@ Resources:
             MapPublicIpOnLaunch: true
             Tags: 
                 - Key: Name 
-                  Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
+                  Value: !Sub ${ID} Public Subnet (AZ2)
 
     PrivateSubnet1: 
         Type: AWS::EC2::Subnet
@@ -95,7 +90,7 @@ Resources:
             MapPublicIpOnLaunch: false
             Tags: 
                 - Key: Name 
-                  Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+                  Value: !Sub ${ID} Private Subnet (AZ1)
 
     PrivateSubnet2: 
         Type: AWS::EC2::Subnet
@@ -106,7 +101,7 @@ Resources:
             MapPublicIpOnLaunch: false
             Tags: 
                 - Key: Name 
-                  Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
+                  Value: !Sub ${ID} Private Subnet (AZ2)
 
     NatGateway1EIP:
         Type: AWS::EC2::EIP
@@ -138,7 +133,7 @@ Resources:
             VpcId: !Ref VPC
             Tags: 
                 - Key: Name 
-                  Value: !Sub ${EnvironmentName} Public Routes
+                  Value: !Sub ${ID} Public Routes
 
     DefaultPublicRoute: 
         Type: AWS::EC2::Route
@@ -166,7 +161,7 @@ Resources:
             VpcId: !Ref VPC
             Tags: 
                 - Key: Name 
-                  Value: !Sub ${EnvironmentName} Private Routes (AZ1)
+                  Value: !Sub ${ID} Private Routes (AZ1)
 
     DefaultPrivateRoute1:
         Type: AWS::EC2::Route
@@ -187,7 +182,7 @@ Resources:
             VpcId: !Ref VPC
             Tags: 
                 - Key: Name 
-                  Value: !Sub ${EnvironmentName} Private Routes (AZ2)
+                  Value: !Sub ${ID} Private Routes (AZ2)
 
     DefaultPrivateRoute2:
         Type: AWS::EC2::Route
@@ -223,71 +218,71 @@ Resources:
                   CidrIp: 0.0.0.0/0
             Tags: 
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-SG-${ID}
+                  Value: !Sub SecurityGroup-${ID}
 Outputs: 
 
     VPC: 
         Description: A reference to the created VPC
         Value: !Ref VPC
         Export:
-          Name: !Sub ${EnvironmentName}-VPCID
+          Name: !Sub VPC-${ID}
 
     VPCPublicRouteTable:
         Description: Public Routing
         Value: !Ref PublicRouteTable
         Export:
-          Name: !Sub ${EnvironmentName}-PUB-RT
+          Name: !Sub ${ID}-PUB-RT
 
     VPCPrivateRouteTable1:
         Description: Private Routing AZ1
         Value: !Ref PrivateRouteTable1
         Export:
-          Name: !Sub ${EnvironmentName}-PRI1-RT
+          Name: !Sub ${ID}-PRI1-RT
 
     VPCPrivateRouteTable2:
         Description: Private Routing AZ2
         Value: !Ref PrivateRouteTable2
         Export:
-          Name: !Sub ${EnvironmentName}-PRI2-RT
+          Name: !Sub ${ID}-PRI2-RT
 
     PublicSubnets:
         Description: A list of the public subnets
         Value: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]]
         Export:
-          Name: !Sub ${EnvironmentName}-PUB-NETS
+          Name: !Sub ${ID}-PUB-NETS
 
     PrivateSubnets:
         Description: A list of the private subnets
         Value: !Join [ ",", [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]]
         Export:
-          Name: !Sub ${EnvironmentName}-PRIV-NETS
+          Name: !Sub ${ID}-PRIV-NETS
 
     PublicSubnet1:
         Description: A reference to the public subnet in the 1st Availability Zone
         Value: !Ref PublicSubnet1
         Export:
-          Name: !Sub ${EnvironmentName}-PUB1-SN
+          Name: !Sub ${ID}-PUB1-SN
 
     PublicSubnet2: 
         Description: A reference to the public subnet in the 2nd Availability Zone
         Value: !Ref PublicSubnet2
         Export:
-          Name: !Sub ${EnvironmentName}-PUB2-SN
+          Name: !Sub ${ID}-PUB2-SN
 
     PrivateSubnet1:
         Description: A reference to the private subnet in the 1st Availability Zone
         Value: !Ref PrivateSubnet1
         Export:
-          Name: !Sub ${EnvironmentName}-PRI1-SN
+          Name: !Sub ${ID}-PRI1-SN
 
     PrivateSubnet2: 
         Description: A reference to the private subnet in the 2nd Availability Zone
         Value: !Ref PrivateSubnet2
         Export:
-          Name: !Sub ${EnvironmentName}-PRI2-SN
+          Name: !Sub ${ID}-PRI2-SN
     
     ControlPlaneSecurityGroup: 
         Description: Security group for the cluster control plane communication with worker nodes
         Value: !Ref ControlPlaneSecurityGroup
         Export:
-            Name: !Sub ${EnvironmentName}-SGID
+            Name: !Sub SecurityGroup-${ID}

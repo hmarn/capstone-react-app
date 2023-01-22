@@ -7,11 +7,6 @@ Parameters:
         Description: Unique identifier.
         Type: String
 
-    EnvironmentName:
-        Description: An environment name that will be prefixed to resource names.
-        Type: String
-        Default: capstone-project
-
     AMITypetoUse:
         Description: An AMI name for node group instance.
         Type: String
@@ -31,7 +26,7 @@ Resources:
     EKSClusterNodeRole:
         Type: AWS::IAM::Role
         Properties:
-            RoleName: !Sub ${EnvironmentName}-cluster-node-role
+            RoleName: !Sub cluster-node-role-${ID}
             AssumeRolePolicyDocument:
                 Version: "2012-10-17"
                 Statement:
@@ -48,7 +43,7 @@ Resources:
                 - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
             Tags:
                 - Key: Name
-                  Value: !Sub ${EnvironmentName}-EKSClusterNodeRole-${ID}
+                  Value: !Sub EKSClusterNodeRole-${ID}
                         
     EKSNodeGroup:
         Type: AWS::EKS::Nodegroup
@@ -60,9 +55,9 @@ Resources:
             Labels: 
                 Key : Value
             DiskSize: 20
-            ClusterName: !Sub ${EnvironmentName}-cluster
+            ClusterName: !Sub cluster-${ID}
             NodeRole: !GetAtt EKSClusterNodeRole.Arn
-            NodegroupName: !Sub ${EnvironmentName}-nodegroup
+            NodegroupName: !Sub nodegroup-${ID}
             ScalingConfig:
                 MinSize: 2
                 MaxSize: 2
@@ -71,20 +66,20 @@ Resources:
                 Fn::Split:
                     - ","
                     - Fn::ImportValue:
-                            Fn::Sub: ${EnvironmentName}-PUB-NETS
+                            Fn::Sub: ${ID}-PUB-NETS
             Tags:
                 Key: Name
-                Value: !Sub ${EnvironmentName}-NodeGroup-${ID}
+                Value: !Sub NodeGroup-${ID}
 
 Outputs:
     EKSClusterNodeRole:
         Description: Role for accessing and creating aws resources
         Value: !GetAtt EKSClusterNodeRole.Arn
         Export:
-            Name: !Sub ${EnvironmentName}-EKSNodeRole-${ID}
+            Name: !Sub EKSClusterNodeRole-${ID}
 
     EKSNodeGroup:
         Description: NodeGroup id
         Value: !Ref EKSNodeGroup
         Export:
-            Name: !Sub ${EnvironmentName}-NodeGroup-${ID}
+            Name: !Sub NodeGroup-${ID}

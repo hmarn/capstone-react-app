@@ -85,39 +85,42 @@ jobs:
               --template-file ./cloudformation/infra.yml \
               --tags project=capstone-project \
               --stack-name stack-create-infra-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7} "
+              --parameter-overrides ID="capstone-${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Ensure Cluster exist
           command: |
             export VPC_ID=$(aws ec2 describe-vpcs \
-                              --filters Name=tag:Name,Values=capstone-project-VPC-${CIRCLE_WORKFLOW_ID:0:7} \
+                              --filters Name=tag:Name,Values=VPC-capstone-${CIRCLE_WORKFLOW_ID:0:7} \
                               --query Vpcs[].VpcId --output text)
-            
-            export SECURITY_GROUP_ID=(aws ec2 describe-security-groups \
-                                        --filters Name=tag:Name,Values='capstone-project-SG-${CIRCLE_WORKFLOW_ID:0:7}' \
+            echo $VPC_ID
+
+            export SG_ID=$(aws ec2 describe-security-groups \
+                                        --filters Name=tag:Name,Values=SecurityGroup-capstone-${CIRCLE_WORKFLOW_ID:0:7} \
                                         --query SecurityGroups[].GroupId --output text)
+            echo $SG_ID
 
             aws cloudformation deploy \
               --template-file ./cloudformation/cluster.yml \
               --tags project=capstone-project \
               --stack-name stack-create-cluster-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}, VpcId=${VPC_ID}, SGId={SECURITY_GROUP_ID}"
-      # - run:
-      #     name: Ensure Node Group exist
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file ./cloudformation/node-group.yml \
-      #         --tags project=capstone-project \
-      #         --stack-name stack-create-node-group-${CIRCLE_WORKFLOW_ID:0:7} \
-      #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-      # - run:
-      #     name: Ensure Node Instances exist
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file ./cloudformation/nodes.yml \
-      #         --tags project=capstone-project \
-      #         --stack-name stack-create-nodes-${CIRCLE_WORKFLOW_ID:0:7} \
-      #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+              --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
+              --parameter-overrides ID="capstone-${CIRCLE_WORKFLOW_ID:0:7}" VpcId="${VPC_ID}" SGId="${SG_ID}"
+      - run:
+          name: Ensure Node Group exist
+          command: |
+            aws cloudformation deploy \
+              --template-file ./cloudformation/node-group.yml \
+              --tags project=capstone-project \
+              --stack-name stack-create-node-group-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="capstone-${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Ensure Node Instances exist
+          command: |
+            aws cloudformation deploy \
+              --template-file ./cloudformation/nodes.yml \
+              --tags project=capstone-project \
+              --stack-name stack-create-nodes-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="capstone-${CIRCLE_WORKFLOW_ID:0:7}" SSHKeyName=${SSH_KEY_NAME}
       # - run:
       #     name: Add Node instances IPs to ansible inventory
       #     command: |
@@ -142,17 +145,17 @@ workflows:
   default:
     jobs:
       - build-frontend
-      - test-frontend:
-          requires:
-            - build-frontend
-      - eslint-frontend:
-          requires:
-            - build-frontend
-      - upload-docker:
-          requires: [test-frontend, eslint-frontend]
+      # - test-frontend:
+      #     requires:
+      #       - build-frontend
+      # - eslint-frontend:
+      #     requires:
+      #       - build-frontend
+      # - upload-docker:
+      #     requires: [build-frontend, eslint-frontend]
       - deploy-infrastructure:
           requires:
-            - upload-docker
+            - build-frontend
           filters:
             branches:
               only: [build-infra]

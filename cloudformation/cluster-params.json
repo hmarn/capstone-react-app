@@ -1,7 +1,7 @@
 [
 	{
-		"ParameterKey": "EnvironmentName",
-		"ParameterValue": "capstone-project"
+		"ParameterKey": "ID",
+		"ParameterValue": "capstone-worflow-id"
 	},
 	{
 		"ParameterKey": "VpcId",
