@@ -72,7 +72,63 @@ jobs:
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
             docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
             docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
-          
+  
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Ensure infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file ./cloudformation/infra.yml \
+              --tags project=capstone-react-app \
+              --stack-name stack-create-infra-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Ensure Cluster exist
+          command: |
+            aws cloudformation deploy \
+              --template-file ./cloudformation/cluster.yml \
+              --tags project=capstone-react-app \
+              --stack-name stack-create-cluster-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Ensure Node Group exist
+          command: |
+            aws cloudformation deploy \
+              --template-file ./cloudformation/node-group.yml \
+              --tags project=capstone-react-app \
+              --stack-name stack-create-node-group-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Ensure Node Instances exist
+          command: |
+            aws cloudformation deploy \
+              --template-file ./cloudformation/nodes.yml \
+              --tags project=capstone-react-app \
+              --stack-name stack-create-nodes-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws cloudformation \
+            list-exports \
+            --query "Exports[?Name==\`capstone-react-app-${CIRCLE_WORKFLOW_ID:0:7}\`].Value" \
+            --output text >> ~/project/ansible/inventory.txt
+
+            echo "List Inventory:"
+            cat ~/project/ansible/inventory.txt
+            echo "End!!!"
+      - run:
+          name: Installing Tar
+          command: yum install -y tar gzip
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/ansible/inventory.txt
+
 workflows:
   version: 2
   default:
@@ -86,5 +142,11 @@ workflows:
             - build-frontend
       - upload-docker:
           requires: [test-frontend, eslint-frontend]
+      - deploy-infrastructure:
+          requires:
+            - upload-docker
+          filters:
+            branches:
+              only: [build-infra]
 
       
