@@ -58,7 +58,7 @@ Resources:
                 - Key: Name
                   Value: !Sub Node1-${ID}
                 - Key: Project
-                  Value: !Ref EnvironmentName
+                  Value: !Ref ID
 
     Node2:
         Type: AWS::EC2::Instance
@@ -72,7 +72,7 @@ Resources:
                 - Key: Name
                   Value: !Sub Node2-${ID}
                 - Key: Project
-                  Value: !Ref EnvironmentName
+                  Value: !Ref ID
 
 Outputs:
     NodesSecurityGroup:
@@ -81,12 +81,12 @@ Outputs:
         Export:
             Name: !Sub Node-SecurityGroup-${ID}
     Node1:
-        Description: Node1 id
-        Value: !Ref Node1
+        Description: PublicIP for Node2 instance
+        Value: !GetAtt Node1.PublicIp
         Export:
             Name: !Sub Node1-${ID}
     Node2:
-        Description: Node2 id
-        Value: !Ref Node2
+        Description: Public for Node2 instance
+        Value: !GetAtt Node2.PublicIp
         Export:
             Name: !Sub Node2-${ID}

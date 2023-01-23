@@ -4,6 +4,16 @@
 #
 version: 2
 
+commands:
+  destroy-environment:
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name stack-create-infra-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name stack-create-cluster-${CIRCLE_WORKFLOW_ID:0:7}
+
 jobs: 
   build-frontend:
     docker:
@@ -86,8 +96,14 @@ jobs:
               --tags project=capstone-project \
               --stack-name stack-create-infra-${CIRCLE_WORKFLOW_ID:0:7} \
               --parameter-overrides ID="capstone-${CIRCLE_WORKFLOW_ID:0:7}"
+  
+  build-cluster:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
       - run:
-          name: Ensure Cluster exist
+          name: Build EKS Cluster
           no_output_timeout: 15m
           command: |
             export VPC_ID=$(aws ec2 describe-vpcs \
@@ -107,15 +123,16 @@ jobs:
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
               --parameter-overrides ID="capstone-${CIRCLE_WORKFLOW_ID:0:7}" VpcId="${VPC_ID}" SGId="${SG_ID}"
       - run:
-          name: Ensure Node Group exist
+          name: Build Node Group for cluster
           command: |
             aws cloudformation deploy \
               --template-file ./cloudformation/node-group.yml \
               --tags project=capstone-project \
               --stack-name stack-create-node-group-${CIRCLE_WORKFLOW_ID:0:7} \
+              --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
               --parameter-overrides ID="capstone-${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
-          name: Ensure Node Instances exist
+          name: Build Nodes Instances for cluster
           command: |
             aws cloudformation deploy \
               --template-file ./cloudformation/nodes.yml \
@@ -127,7 +144,12 @@ jobs:
           command: |
             aws cloudformation \
             list-exports \
-            --query "Exports[?Name==\`capstone-project-${CIRCLE_WORKFLOW_ID:0:7}\`].Value" \
+            --query "Exports[?Name==\`Node1-${CIRCLE_WORKFLOW_ID:0:7}\`].Value" \
+            --output text >> ~/project/ansible/inventory.txt
+
+            aws cloudformation \
+            list-exports \
+            --query "Exports[?Name==\`Node2-${CIRCLE_WORKFLOW_ID:0:7}\`].Value" \
             --output text >> ~/project/ansible/inventory.txt
 
             echo "List Inventory:"
@@ -140,7 +162,6 @@ jobs:
           root: ~/
           paths:
             - project/ansible/inventory.txt
-
 workflows:
   version: 2
   default:
@@ -157,6 +178,12 @@ workflows:
       - deploy-infrastructure:
           requires:
             - build-frontend
+          filters:
+            branches:
+              only: [build-infra]
+      - build-cluster:
+          requires:
+            - deploy-infrastructure
           filters:
             branches:
               only: [build-infra]
