@@ -129,7 +129,7 @@ jobs:
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
-          resource-file-path: deployment.json
+          resource-file-path: ./scripts/deployment.json
           resource-name: deployment/blue
 
   create-service:
@@ -146,29 +146,29 @@ jobs:
           cluster-name: << parameters.cluster-name >>
           install-kubectl: true
       - kubernetes/create-or-update-resource:
-          resource-file-path: service.json
+          resource-file-path: ./scripts/service.json
           resource-name: service/bluegreenlb
 
 workflows:
   default:
     jobs:
-      # - build-frontend
-      # - test-frontend:
-      #     requires:
-      #       - build-frontend
-      # - eslint-frontend:
-      #     requires:
-      #       - build-frontend
-      # - upload-docker:
-      #     requires: [test-frontend, eslint-frontend]
-      # - aws-eks/create-cluster:
-      #     cluster-name: my-eks-blue
-      #     requires:
-      #       - upload-docker
+      - build-frontend
+      - test-frontend:
+          requires:
+            - build-frontend
+      - eslint-frontend:
+          requires:
+            - build-frontend
+      - upload-docker:
+          requires: [test-frontend, eslint-frontend]
+      - aws-eks/create-cluster:
+          cluster-name: my-eks-blue
+          requires:
+            - upload-docker
       - test-cluster:
           cluster-name: my-eks-blue
-          # requires:
-          #   - aws-eks/create-cluster
+          requires:
+            - aws-eks/create-cluster
       - create-service:
           cluster-name: my-eks-blue
           requires:
