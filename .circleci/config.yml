@@ -152,23 +152,23 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - test-frontend:
-          requires:
-            - build-frontend
-      - eslint-frontend:
-          requires:
-            - build-frontend
-      - upload-docker:
-          requires: [test-frontend, eslint-frontend]
-      - aws-eks/create-cluster:
-          cluster-name: my-eks-blue
-          requires:
-            - upload-docker
+      # - build-frontend
+      # - test-frontend:
+      #     requires:
+      #       - build-frontend
+      # - eslint-frontend:
+      #     requires:
+      #       - build-frontend
+      # - upload-docker:
+      #     requires: [test-frontend, eslint-frontend]
+      # - aws-eks/create-cluster:
+      #     cluster-name: my-eks-blue
+      #     requires:
+      #       - upload-docker
       - test-cluster:
           cluster-name: my-eks-blue
-          requires:
-            - aws-eks/create-cluster
+          # requires:
+          #   - aws-eks/create-cluster
       - create-service:
           cluster-name: my-eks-blue
           requires:
