@@ -73,8 +73,8 @@ jobs:
           command: |
             echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
-            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
+            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:latest
   
   test-cluster:
     docker:
@@ -110,9 +110,44 @@ jobs:
           cluster-name: << parameters.cluster-name >>
       - run:
           command: |
-            kubectl create deploy $DOCKERHUB_USERNAME --image=$DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
+            kubectl create deploy $DOCKERHUB_USERNAME --image=$DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:latest
             kubectl get deploy,rs,svc,pods
           name: Deploy cluster
+  
+  create-deployment:
+    docker:
+      - image: cimg/python:3.10
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          resource-file-path: deployment.json
+          resource-name: deployment/blue
+
+  create-service:
+    docker:
+      - image: cimg/python:3.10
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          resource-file-path: service.json
+          resource-name: service/bluegreenlb
 
 workflows:
   default:
@@ -134,8 +169,18 @@ workflows:
           cluster-name: my-eks-blue
           requires:
             - aws-eks/create-cluster
-      - deploy-cluster:
+      - create-service:
           cluster-name: my-eks-blue
           requires:
             - test-cluster
+      - create-deployment:
+          cluster-name: my-eks-blue
+          requires:
+            - create-service
+      - aws-eks/update-container-image:
+          cluster-name: my-eks-blue
+          container-image-updates: "blue=$DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
+          requires:
+            - create-deployment
+          resource-name: deployment/blue
       
