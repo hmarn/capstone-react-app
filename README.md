@@ -1,70 +1,51 @@
-# Getting Started with Create React App
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/hmarn/capstone-react-app/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/hmarn/capstone-react-app/tree/main)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Capstone - Cloud DevOps
 
-## Available Scripts
+### Instructions
 
-In the project directory, you can run:
+- Working in AWS
+- Using Jenkins or Circle CI to implement Continuous Integration and Continuous Deployment
+- Building pipelines
+- Working with Ansible and CloudFormation to deploy clusters
+- Building Kubernetes clusters
+- Building Docker containers in pipelines
 
-### `npm start`
+### Project Tasks
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Step 1: Propose and Scope the Project
+- [x] ReactJS frontend application - Currency Exchange converter
+- [x] Circle CI is used for Continuous Integration phase
+- [x] Deployment type: Rolling deployment
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Step 2: Use Jenkins or Circle CI, and implement blue/green or rolling deployment.
+- [x] Using Circle CI, set up circle CI account and connected git repository.
+- [x] Setting up environment to where application is going to deploy
 
-### `npm test`
+Step 3: Pick AWS Kubernetes as a Service, or build your own Kubernetes cluster.
+- [x] Using CloudFormation to build applicaiton “infrastructure”; i.e., the Kubernetes Cluster.
+- [x] Created the EC2 instances
+- [x] As a final step, the Kubernetes cluster is being initialized. The Kubernetes cluster initialization is done by Cloudformation using CircleCI orbs.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Step 4: Build your pipeline
+- [x] Construct the pipeline in GitHub repository.
+- [x] Set up all the steps that pipeline will include.
+- [x] Configure a deployment pipeline.
+- [x] Include the Dockerfile/source code in the Git repository.
+- [x] Include with the Linting step both a failed Linting screenshot and a successful Linting screenshot to show the Linter working properly.
 
-### `npm run build`
+Step 5: Test your pipeline
+- [x] Perform builds on the pipeline.
+- [x] Verify that the pipeline works as you designed it.
+- [x] Taking a screenshot of the Circle CI or Jenkins pipeline showing deployment, and a screenshot of your AWS EC2 page showing the modified (for rolling) instances.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Built With
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- [Circle CI](www.circleci.com) - Cloud-based CI/CD service
+- [Amazon EKS](https://aws.amazon.com/) - https://aws.amazon.com/eks/
+- [AWS CLI](https://aws.amazon.com/cli/) - Command-line tool for AWS
+- [CloudFormation](https://aws.amazon.com/cloudformation/) - Infrastrcuture as code
+- [Docker](https://www.docker.com/) - Docker Containerization
+- [Kubernetes](https://kubernetes.io/) - Kubernetes Cluster 
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

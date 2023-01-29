@@ -1,0 +1,5 @@
+Capstone Project
+
+Project url: https://github.com/hmarn/capstone-react-app
+
+Application url: http://a236211fdb845496fa78115825d4020c-2100346793.us-west-2.elb.amazonaws.com:3000
