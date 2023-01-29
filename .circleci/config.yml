@@ -183,8 +183,4 @@ workflows:
           requires:
             - create-deployment
           resource-name: deployment/rolling-app
-      - aws-eks/delete-cluster:
-          cluster-name: capstone
-          requires:
-            - aws-eks/update-container-image
       
