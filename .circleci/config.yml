@@ -162,29 +162,29 @@ workflows:
       - upload-docker:
           requires: [test-frontend, eslint-frontend]
       - aws-eks/create-cluster:
-          cluster-name: capstone-eks
+          cluster-name: capstone
           requires:
             - upload-docker
       - test-cluster:
-          cluster-name: capstone-eks
+          cluster-name: capstone
           requires:
             - aws-eks/create-cluster
       - create-service:
-          cluster-name: capstone-eks
+          cluster-name: capstone
           requires:
             - test-cluster
       - create-deployment:
-          cluster-name: capstone-eks
+          cluster-name: capstone
           requires:
             - create-service
       - aws-eks/update-container-image:
-          cluster-name: capstone-eks
+          cluster-name: capstone
           container-image-updates: "rolling-deployment-container=$DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
           requires:
             - create-deployment
           resource-name: deployment/rolling-app
       - aws-eks/delete-cluster:
-          cluster-name: capstone-eks
+          cluster-name: capstone
           requires:
             - aws-eks/update-container-image
       
