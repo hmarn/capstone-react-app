@@ -52,6 +52,7 @@ jobs:
           command: |
             sudo npm install
             npm run lint
+            exit 1
 
   upload-docker:
     docker:
