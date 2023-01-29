@@ -75,8 +75,8 @@ jobs:
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
             docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:latest
             docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:latest
-  
-  test-cluster:
+
+  create-cluster:
     docker:
       - image: cimg/python:3.10
     parameters:
@@ -85,6 +85,40 @@ jobs:
           Name of the EKS cluster
         type: string
     steps:
+      - checkout
+      - run:
+          name: Installing AWS CLI
+          command: |
+            apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            aws --version
+      - run:
+          name: Check existing cluster
+          command: |
+            export OLD_CLUSTER=$(aws eks list-clusters --query 'clusters' --output text | tr '\t' '\n' | grep << parameters.cluster-name >>)
+            echo OLD_CLUSTER: "${OLD_CLUSTER}"
+
+            if [ "$OLD_CLUSTER" == << parameters.cluster-name >> ]; then
+              echo "Found OLD_CLUSTER !!"
+              circleci step halt
+            else
+              echo "Not Found OLD_CLUSTER !!"
+            fi
+      - aws-eks/create-cluster:
+          cluster-name: << parameters.cluster-name >>
+
+  check-cluster:
+    docker:
+      - image: cimg/python:3.10
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
       - kubernetes/install:
           kubectl-version: v1.22.0
       - aws-eks/update-kubeconfig-with-authenticator:
@@ -161,18 +195,18 @@ workflows:
             - build-frontend
       - upload-docker:
           requires: [test-frontend, eslint-frontend]
-      - aws-eks/create-cluster:
+      - create-cluster:
           cluster-name: capstone
           requires:
             - upload-docker
-      - test-cluster:
+      - check-cluster:
           cluster-name: capstone
           requires:
-            - aws-eks/create-cluster
+            - create-cluster
       - create-service:
           cluster-name: capstone
           requires:
-            - test-cluster
+            - check-cluster
       - create-deployment:
           cluster-name: capstone
           requires:
